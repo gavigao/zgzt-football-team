@@ -1,11 +1,10 @@
 [
   {
     "id": 1,
-    "name": "张三",
-    "number": "10",
+    "name": "高嘉恒",
+    "number": "6",
     "position": "前锋",
     "group": "forward",
-    "bio": "队长，技术全面，射门精准。",
     "avatar": ""
   },
   {
@@ -14,7 +13,6 @@
     "number": "1",
     "position": "门将",
     "group": "goalkeeper",
-    "bio": "反应迅速，擅长指挥后防线。",
     "avatar": ""
   },
   {
@@ -23,7 +21,6 @@
     "number": "4",
     "position": "后卫",
     "group": "defender",
-    "bio": "防守稳健，空中对抗能力强。",
     "avatar": ""
   },
   {
@@ -32,7 +29,6 @@
     "number": "6",
     "position": "中场",
     "group": "midfielder",
-    "bio": "节奏组织者，传球视野开阔。",
     "avatar": ""
   },
   {
@@ -41,7 +37,6 @@
     "number": "9",
     "position": "前锋",
     "group": "forward",
-    "bio": "跑位积极，门前把握机会能力强。",
     "avatar": ""
   },
   {
@@ -50,7 +45,6 @@
     "number": "2",
     "position": "后卫",
     "group": "defender",
-    "bio": "边路速度快，攻守转换效率高。",
     "avatar": ""
   },
   {
@@ -59,7 +53,6 @@
     "number": "8",
     "position": "中场",
     "group": "midfielder",
-    "bio": "拦截积极，二点球处理稳定。",
     "avatar": ""
   },
   {
@@ -68,7 +61,6 @@
     "number": "11",
     "position": "前锋",
     "group": "forward",
-    "bio": "擅长边路突破，终结能力突出。",
     "avatar": ""
   },
   {
@@ -77,7 +69,6 @@
     "number": "3",
     "position": "后卫",
     "group": "defender",
-    "bio": "协防意识好，覆盖范围大。",
     "avatar": ""
   },
   {
@@ -86,7 +77,6 @@
     "number": "5",
     "position": "后卫",
     "group": "defender",
-    "bio": "对抗强硬，定位球防守可靠。",
     "avatar": ""
   },
   {
@@ -95,7 +85,6 @@
     "number": "7",
     "position": "中场",
     "group": "midfielder",
-    "bio": "覆盖面积大，具备后插上能力。",
     "avatar": ""
   },
   {
@@ -104,7 +93,6 @@
     "number": "12",
     "position": "门将",
     "group": "goalkeeper",
-    "bio": "年轻门将，扑救果断，成长迅速。",
     "avatar": ""
   }
 ]
