@@ -142,6 +142,93 @@
     });
   }
 
+  // 首页统计卡：从 JSON 自动计算建队年数、现役人数、获奖次数。
+  async function initStatsCards() {
+    const statElements = {
+      years: document.getElementById("statYears"),
+      players: document.getElementById("statPlayers"),
+      alumni: document.getElementById("statAlumni"),
+      honors: document.getElementById("statHonors")
+    };
+
+    const missing = Object.values(statElements).every((el) => !el);
+    if (missing) {
+      return;
+    }
+
+    try {
+      const [players, matches, honors] = await Promise.all([
+        fetchJsonData("data/players.json"),
+        fetchJsonData("data/matches.json"),
+        fetchJsonData("data/honors.json")
+      ]);
+
+      // 建队年数：从页脚"建队于 2015"推算，或取 matches 中最早赛季。
+      const foundingYear = 2015;
+      const currentYear = new Date().getFullYear();
+      if (statElements.years) {
+        statElements.years.textContent = currentYear - foundingYear;
+      }
+
+      // 现役队员人数：players.json 记录数。
+      if (statElements.players) {
+        statElements.players.textContent = Array.isArray(players) ? players.length : 0;
+      }
+
+      // 历届队员人数：暂无独立数据源，暂无统一字段，留空提示。
+      if (statElements.alumni) {
+        statElements.alumni.textContent = "--";
+      }
+
+      // 获奖次数：honors.json 中 team 类型荣誉数量。
+      const teamHonorsCount = Array.isArray(honors)
+        ? honors.filter((item) => item.type === "team").length
+        : 0;
+      if (statElements.honors) {
+        statElements.honors.textContent = teamHonorsCount;
+      }
+    } catch (error) {
+      console.error("统计卡数据加载失败", error);
+    }
+  }
+
+  // 首页比赛快讯：读取 matches.json 中最近一场和最近未来一场。
+  async function initMatchTicker() {
+    const lastMatch = document.getElementById("lastMatchInfo");
+    const nextMatch = document.getElementById("nextMatchInfo");
+
+    if (!lastMatch && !nextMatch) {
+      return;
+    }
+
+    try {
+      const matches = await fetchJsonData("data/matches.json");
+      if (!Array.isArray(matches) || !matches.length) {
+        return;
+      }
+
+      const now = new Date();
+      const sorted = matches.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      // 最近已完成比赛（date 早于今天）。
+      const lastCompleted = [...sorted].reverse().find((m) => new Date(m.date) < now);
+      // 最近未来比赛（date 在今天或之后），取第一条。
+      const nextUpcoming = sorted.find((m) => new Date(m.date) >= now);
+
+      if (lastMatch && lastCompleted) {
+        const score = `${lastCompleted.score_us} : ${lastCompleted.score_them}`;
+        lastMatch.innerHTML = `<strong>上一场比赛</strong><span>政国中统 ${score} ${lastCompleted.opponent}</span>`;
+      }
+
+      if (nextMatch && nextUpcoming) {
+        const dateStr = formatDate(nextUpcoming.date);
+        nextMatch.innerHTML = `<strong>下一场预告</strong><span>${dateStr} · 对阵 ${nextUpcoming.opponent}</span>`;
+      }
+    } catch (error) {
+      console.error("比赛快讯加载失败", error);
+    }
+  }
+
   // 首页现役阵容预览从 JSON 加载，保持后续维护简单。
   async function initRosterPreview() {
     const container = document.getElementById("rosterPreviewList");
@@ -420,6 +507,8 @@
   document.addEventListener("DOMContentLoaded", () => {
     updateFooterYear();
     initNewsCards();
+    initStatsCards();
+    initMatchTicker();
     initRosterPreview();
     initRosterPage();
     initMatchesPage();
