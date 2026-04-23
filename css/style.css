@@ -323,6 +323,9 @@ a:hover {
 }
 
 .player-preview-card {
+  text-decoration: none;
+  color: inherit;
+
   min-width: 180px;
   max-width: 180px;
   border-radius: 0.75rem;
@@ -438,6 +441,12 @@ a:hover {
   flex-direction: column;
   box-shadow: 0 8px 18px rgba(20, 40, 70, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.roster-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
 .roster-card:hover {

@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "category": "match",
+    "title": "联赛揭幕战 · 赛前合影",
+    "date": "2026-04-10",
+    "description": "2026赛季校际联赛揭幕战赛前合影留念"
+  },
+  {
+    "id": 2,
+    "category": "match",
+    "title": "冠军争夺战 · 终场庆祝",
+    "date": "2025-11-02",
+    "description": "联赛决赛终场哨响，队员庆祝胜利"
+  },
+  {
+    "id": 3,
+    "category": "training",
+    "title": "力量训练 · 核心组",
+    "date": "2026-03-20",
+    "description": "日常训练力量核心组备战场面"
+  },
+  {
+    "id": 4,
+    "category": "training",
+    "title": "夜训冲刺 · 折返跑",
+    "date": "2026-03-18",
+    "description": "晚间训练冲刺折返跑项目"
+  },
+  {
+    "id": 5,
+    "category": "team",
+    "title": "春季团建 · 山野徒步",
+    "date": "2026-03-28",
+    "description": "春季团建活动山野徒步合影"
+  },
+  {
+    "id": 6,
+    "category": "team",
+    "title": "年度聚餐 · 全队合照",
+    "date": "2025-12-30",
+    "description": "2025年度聚餐全体成员合影"
+  },
+  {
+    "id": 7,
+    "category": "match",
+    "title": "客场比赛 · 中场调整",
+    "date": "2025-10-15",
+    "description": "客场对阵外国语学院中场战术调整"
+  },
+  {
+    "id": 8,
+    "category": "training",
+    "title": "战术演练 · 分组对抗",
+    "date": "2025-09-09",
+    "description": "赛前战术演练分组对抗训练"
+  },
+  {
+    "id": 9,
+    "category": "team",
+    "title": "十周年筹备 · 资料整理日",
+    "date": "2025-08-21",
+    "description": "球队十周年庆筹备资料整理工作"
+  }
+]

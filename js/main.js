@@ -54,6 +54,65 @@
     }
   }
 
+  // 轻量 CSV 解析器（处理带引号和逗号的字段）
+  function parseCSV(text) {
+    const rows = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '"') {
+        if (inQuotes && text[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if ((ch === "," || ch === "\n") && !inQuotes) {
+        if (ch === "\n") {
+          if (current.trim() || rows.length > 0) rows.push(current.trim());
+        } else {
+          rows.push(current.trim());
+        }
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+    if (current.trim()) rows.push(current.trim());
+
+    if (rows.length === 0) return [];
+    const headers = rows[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+    const result = [];
+
+    let colIndex = headers.length;
+    while (colIndex < rows.length) {
+      const values = [];
+      for (let h = 0; h < headers.length; h++) {
+        values.push(rows[colIndex + h] || "");
+      }
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (values[i] || "").replace(/^"|"$/g, ""); });
+      result.push(obj);
+      colIndex += headers.length;
+    }
+
+    return result;
+  }
+
+  // 自动识别文件类型获取数据
+  async function fetchData(url) {
+    const isCSV = url.endsWith(".csv");
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (isCSV) {
+      const text = await response.text();
+      return parseCSV(text);
+    }
+    return response.json();
+  }
+
   function getAvatarMarkup(player, shape) {
     if (player.avatar) {
       return `<img class="player-photo" src="${player.avatar}" alt="${player.name} 头像">`;
@@ -158,7 +217,7 @@
 
     try {
       const [players, matches, honors] = await Promise.all([
-        fetchJsonData("data/players.json"),
+        fetchData("data/players.csv"),
         fetchJsonData("data/matches.json"),
         fetchJsonData("data/honors.json")
       ]);
@@ -170,7 +229,7 @@
         statElements.years.textContent = currentYear - foundingYear;
       }
 
-      // 现役队员人数：players.json 记录数。
+      // 现役队员人数：players.csv 记录数。
       if (statElements.players) {
         statElements.players.textContent = Array.isArray(players) ? players.length : 0;
       }
@@ -237,20 +296,20 @@
     }
 
     try {
-      const players = await fetchJsonData("data/players.json");
+      const players = await fetchData("data/players.csv");
       if (!Array.isArray(players) || !players.length) {
         renderBlockMessage(container, "暂无现役队员数据。", "empty");
         return;
       }
 
       container.innerHTML = players.slice(0, 8).map((player) => `
-        <article class="player-preview-card">
+        <a href="player.html?id=${player.id}" class="player-preview-card" title="查看 ${player.name} 的个人页">
           <div class="player-avatar-square">${getAvatarMarkup(player, "square")}</div>
           <div class="player-meta">
             <h3 class="player-name fs-6">${player.name}</h3>
             <p class="player-sub">#${player.number} · ${POSITION_LABELS[player.group] || player.position}</p>
           </div>
-        </article>
+        </a>
       `).join("");
     } catch (error) {
       renderBlockMessage(container, "现役阵容预览加载失败，请稍后重试。", "error");
@@ -265,7 +324,7 @@
     }
 
     try {
-      const players = await fetchJsonData("data/players.json");
+      const players = await fetchData("data/players.csv");
       if (!Array.isArray(players) || !players.length) {
         renderBlockMessage(container, "暂无阵容数据。", "empty");
         return;
@@ -288,16 +347,18 @@
         const cards = groupPlayers.length
           ? groupPlayers.map((player) => `
               <div class="roster-card-item">
-                <article class="roster-card">
-                  <div class="roster-card-top">
-                    <span class="roster-jersey-number">${player.number}</span>
-                    <div class="roster-avatar-wrap">${getAvatarMarkup(player, "circle")}</div>
-                  </div>
-                  <div class="roster-card-info">
-                    <span class="roster-position-badge">${getPositionShortLabel(player.group, player.position)}</span>
-                    <h3 class="roster-player-name">${player.name}</h3>
-                  </div>
-                </article>
+                <a href="player.html?id=${player.id}" class="roster-card-link" title="查看 ${player.name} 的个人页">
+                  <article class="roster-card">
+                    <div class="roster-card-top">
+                      <span class="roster-jersey-number">${player.number}</span>
+                      <div class="roster-avatar-wrap">${getAvatarMarkup(player, "circle")}</div>
+                    </div>
+                    <div class="roster-card-info">
+                      <span class="roster-position-badge">${getPositionShortLabel(player.group, player.position)}</span>
+                      <h3 class="roster-player-name">${player.name}</h3>
+                    </div>
+                  </article>
+                </a>
               </div>
             `).join("")
           : '<div class="empty-state">暂无该位置队员信息。</div>';

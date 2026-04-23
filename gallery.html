@@ -35,7 +35,7 @@
     <main class="section-block">
       <div class="container">
         <h1 class="section-heading mb-1">球队相册</h1>
-        <p class="section-subheading">当前使用统一占位样式，可后续替换为真实图片。</p>
+        <p class="section-subheading">数据来源于 data/gallery.json，添加新图片只需在 JSON 中添加一条记录即可。</p>
 
         <section class="mb-4">
           <h2 class="h5 mb-3">分类筛选</h2>
@@ -48,61 +48,8 @@
         </section>
 
         <section>
-          <div class="row g-3">
-            <div class="col-6 col-lg-4 gallery-item" data-category="match" data-title="联赛揭幕战 · 赛前合影">
-              <article class="h-100">
-                <div class="gallery-placeholder">联赛揭幕战 · 赛前合影</div>
-                <p class="small text-muted mt-2 mb-0">比赛 · 2026-04-10</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="match" data-title="冠军争夺战 · 终场庆祝">
-              <article class="h-100">
-                <div class="gallery-placeholder">冠军争夺战 · 终场庆祝</div>
-                <p class="small text-muted mt-2 mb-0">比赛 · 2025-11-02</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="training" data-title="力量训练 · 核心组">
-              <article class="h-100">
-                <div class="gallery-placeholder">力量训练 · 核心组</div>
-                <p class="small text-muted mt-2 mb-0">训练 · 2026-03-20</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="training" data-title="夜训冲刺 · 折返跑">
-              <article class="h-100">
-                <div class="gallery-placeholder">夜训冲刺 · 折返跑</div>
-                <p class="small text-muted mt-2 mb-0">训练 · 2026-03-18</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="team" data-title="春季团建 · 山野徒步">
-              <article class="h-100">
-                <div class="gallery-placeholder">春季团建 · 山野徒步</div>
-                <p class="small text-muted mt-2 mb-0">团建 · 2026-03-28</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="team" data-title="年度聚餐 · 全队合照">
-              <article class="h-100">
-                <div class="gallery-placeholder">年度聚餐 · 全队合照</div>
-                <p class="small text-muted mt-2 mb-0">团建 · 2025-12-30</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="match" data-title="客场比赛 · 中场调整">
-              <article class="h-100">
-                <div class="gallery-placeholder">客场比赛 · 中场调整</div>
-                <p class="small text-muted mt-2 mb-0">比赛 · 2025-10-15</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="training" data-title="战术演练 · 分组对抗">
-              <article class="h-100">
-                <div class="gallery-placeholder">战术演练 · 分组对抗</div>
-                <p class="small text-muted mt-2 mb-0">训练 · 2025-09-09</p>
-              </article>
-            </div>
-            <div class="col-6 col-lg-4 gallery-item" data-category="team" data-title="十周年筹备 · 资料整理日">
-              <article class="h-100">
-                <div class="gallery-placeholder">十周年筹备 · 资料整理日</div>
-                <p class="small text-muted mt-2 mb-0">团建 · 2025-08-21</p>
-              </article>
-            </div>
+          <div id="galleryGrid" class="row g-3">
+            <div class="col-12"><div class="empty-state">相册数据加载中...</div></div>
           </div>
         </section>
       </div>
@@ -116,8 +63,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
           </div>
           <div class="modal-body">
-            <div id="galleryModalPlaceholder" class="lightbox-placeholder">图片预览</div>
-            <p class="small text-muted mt-2 mb-0">分类：<span id="galleryModalTag">未分类</span></p>
+            <div id="galleryModalBody" class="lightbox-placeholder">图片预览区域（请将图片文件放入 img/gallery/ 目录，并修改 gallery.json 中的 url 字段）</div>
+            <p id="galleryModalDesc" class="mt-2 mb-0 small text-muted"></p>
+            <p class="mb-0 small text-muted">分类：<span id="galleryModalTag">未分类</span> · 日期：<span id="galleryModalDate">-</span></p>
           </div>
         </div>
       </div>
@@ -132,5 +80,97 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const GALLERY_CATEGORY_LABELS = { match: "比赛", training: "训练", team: "团建" };
+
+        async function initGallery() {
+          const grid = document.getElementById("galleryGrid");
+          const filterWrap = document.getElementById("galleryFilters");
+          const modalElement = document.getElementById("galleryModal");
+
+          if (!grid || !filterWrap) return;
+
+          let galleryData = [];
+          let activeFilter = "all";
+          let galleryModal = null;
+
+          if (modalElement && typeof bootstrap !== "undefined") {
+            galleryModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          }
+
+          try {
+            const res = await fetch("data/gallery.json", { cache: "no-store" });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            galleryData = await res.json();
+          } catch (err) {
+            grid.innerHTML = '<div class="col-12"><div class="load-error">相册数据加载失败，请检查 data/gallery.json 是否存在。</div></div>';
+            return;
+          }
+
+          function renderGrid(filter) {
+            const filtered = filter === "all" ? galleryData : galleryData.filter(item => item.category === filter);
+
+            if (!filtered.length) {
+              grid.innerHTML = '<div class="col-12"><div class="empty-state">该分类下暂无图片。</div></div>';
+              return;
+            }
+
+            grid.innerHTML = filtered.map(item => `
+              <div class="col-6 col-lg-4 gallery-item" data-category="${item.category}" data-title="${item.title}" data-id="${item.id}">
+                <article class="h-100">
+                  <div class="gallery-placeholder">${item.title}</div>
+                  <p class="small text-muted mt-2 mb-0">${GALLERY_CATEGORY_LABELS[item.category] || item.category} · ${item.date}</p>
+                </article>
+              </div>
+            `).join("");
+
+            // 绑定点击事件
+            grid.querySelectorAll(".gallery-item").forEach(el => {
+              el.addEventListener("click", () => {
+                const id = Number(el.dataset.id);
+                const item = galleryData.find(g => g.id === id);
+                if (!item || !galleryModal) return;
+
+                document.getElementById("galleryModalCaption").textContent = item.title;
+                document.getElementById("galleryModalTag").textContent = GALLERY_CATEGORY_LABELS[item.category] || item.category;
+                document.getElementById("galleryModalDate").textContent = item.date;
+                document.getElementById("galleryModalDesc").textContent = item.description || "";
+
+                // 图片区域：如果有 url 则显示图片，否则显示提示
+                const body = document.getElementById("galleryModalBody");
+                if (item.url) {
+                  body.innerHTML = `<img src="${item.url}" alt="${item.title}" style="width:100%;border-radius:0.5rem;">`;
+                } else {
+                  body.innerHTML = `<div class="lightbox-placeholder">请将图片放入 img/gallery/ 目录<br>并修改 gallery.json 中对应记录的 url 字段</div>`;
+                }
+
+                galleryModal.show();
+              });
+            });
+          }
+
+          // 筛选按钮
+          filterWrap.addEventListener("click", e => {
+            const btn = e.target.closest("button[data-filter]");
+            if (!btn) return;
+            filterWrap.querySelectorAll("button").forEach(b => {
+              b.classList.remove("btn-team-primary", "active");
+              b.classList.add("btn-team-outline");
+            });
+            btn.classList.remove("btn-team-outline");
+            btn.classList.add("btn-team-primary", "active");
+            activeFilter = btn.dataset.filter;
+            renderGrid(activeFilter);
+          });
+
+          renderGrid("all");
+        }
+
+        document.addEventListener("DOMContentLoaded", initGallery);
+      })();
+    </script>
   </body>
 </html>

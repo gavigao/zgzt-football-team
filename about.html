@@ -78,29 +78,39 @@
 
         <section class="about-card p-3">
           <h2 class="h5 mb-3">留言板</h2>
-          <!-- Waline 留言板配置说明（完成配置后，将下方代码取消注释即可启用） -->
-          <div class="waline-config-guide">
-            <p><strong>Waline 留言板配置步骤：</strong></p>
-            <ol class="mb-2">
-              <li>前往 <a href="https://waline.js.org/" target="_blank">Waline 官网</a> 部署服务端获取 Server URL（如 Vercel、Railway 等）</li>
-              <li>在下方代码中将 <code>serverURL</code> 替换为你的实际地址，例如：<code>https://your-app.vercel.app</code></li>
-              <li>将注释符号 <code>&lt;!--</code> 和 <code>--&gt;</code> 去掉，使代码生效</li>
-            </ol>
-            <p class="mb-0 text-muted small">注意：配置完成后，请删除此配置说明区块，仅保留 Waline 初始化代码。</p>
-          </div>
+          <div id="disqus_thread"></div>
+          <noscript>请启用 JavaScript 查看留言板。</noscript>
           <!--
-          <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
-          <div id="waline"></div>
-          <script type="module">
-            import { init } from "https://unpkg.com/@waline/client@v3/dist/waline.js";
-            init({
-              el: "#waline",
-              serverURL: "https://your-waline-server.vercel.app",
-              path: window.location.pathname
-            });
-          </script>
+          Disqus 留言板配置步骤：
+          1. 前往 https://disqus.com 注册账号并创建站点，获取你的 shortname
+          2. 将下方的 "your-team-shortname" 替换为你的实际 shortname
+          3. 删除这些注释和 noscript 标签之间的所有内容，保留脚本标签
           -->
-          <div class="placeholder-box">Waline 留言板占位区域（当前未配置）。</div>
+          <script>
+            /**
+             * Disqus 留言板配置
+             *
+             * 启用步骤：
+             * 1. 打开 https://disqus.com 注册并创建站点（选择 "I want to install Disqus on my site"）
+             * 2. Website Name 即你的 shortname，例如 "zhongtong-football"
+             * 3. 将下方的 shortname 替换为你的实际值
+             * 4. 将此 <script> 标签上方的 HTML 注释删除即可生效
+             */
+            var disqus_config = function () {
+              // this.page.url = window.location.href;
+              // this.page.identifier = window.location.pathname;
+            };
+            (function() {
+              var d = document, s = d.createElement('script');
+              s.src = 'https://your-team-shortname.disqus.com/embed.js';
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <div class="placeholder-box">
+            <p class="mb-1">Disqus 留言板占位区域</p>
+            <p class="mb-0 small text-muted">配置说明：删除上方注释，填入你的 Disqus shortname 即可启用。</p>
+          </div>
         </section>
       </div>
     </main>
